@@ -32,11 +32,14 @@ def add_one_element(summ, point, d):
 #point=[1.,0.,0.]
 #print add_one_element(summ, point, 2)
 
-def compute_average(points):
-    n1 = len(points)
-    d = len(points[0])
+def compute_centroids(points, d):
     summ=[0.]*d
     cnt = 0
+
+    n1 = len(points)
+    if n1==0:
+        return summ
+
     for i in range(n1):
         cnt +=1
         for j in range(d):
@@ -49,66 +52,39 @@ def compute_average(points):
 # points has n elements, each element is d-dimension
 def kmeans(points, k):
     # pick some centeroids
-
     n = len(points)
     d = len(points[0])
-
     elem = [0.]*d
     centro = []
     groups = [None]*k
-    cnt = [0]*k
-    summ = [elem]*k
-    print 'cnt', cnt
-    print 'summ', summ
-
     # use the initial k points as the centeroids
     for i in range(k):
         centro.append(points[i])
         groups[i] = []
-
     # assume each element is associated with centroid 0
     indx_arr = [0]*n
-
+    for i in range(n):
+        groups[0].append(points[i])
     change = True
-    while (change):
-     change = False
-     for i in range(n):
-        indx = nearest_centeroid(points[i], centro, k)
-        groups[indx].append(points[i])
-        indx_arr[i] = indx
-        change = True
-     print 'indx_arr', indx_arr
+    iter_times = 0
 
-     print groups[0], groups[1]
-    # compute the new centeroids
-     if (change):
-        for i in range(k):
-            centro[i] = compute_average(groups[i])
-
-        """
-        for i in range(k):
-            for j in range(n):
-                if indx_arr[j] == i:
-                    cnt[i] += 1
-                    #print 'xxxx', summ[i], points[j]
-                    #summ = add_one_element(summ[i], points[j], d)
-                    #summ[i] += points[j]
-        print summ
-
-
+    while (change and iter_times< 1000):
+        change = False
+        iter_times += 1
         for i in range(n):
-            cnt[indx_arr[i]] += 1
-            for j in range(d):
-                #if (i == indx_arr[i]):
-                summ[indx_arr[i]][j] += points[i][j]
-                print 'update summ', indx_arr[i],j
-                print 'indx_arr', indx_arr[i], 'points', points[i][j], 'summ', summ
-        print 'cnt', cnt
-        print 'summ', summ
+            indx = nearest_centeroid(points[i], centro, k)
+            if points[i] not in groups[indx]:
+                change = True
+                groups[indx].append(points[i])
+                if points[i] in groups[indx_arr[i]]:
+                    groups[indx_arr[i]].remove(points[i])
+                indx_arr[i] = indx
+
+        print 'iter_times', iter_times, 'indx_arr', indx_arr
+        print 'groups[0]', groups[0], 'groups[1]', groups[1]
         for i in range(k):
-            for j in range(d):
-                centro[i][j] = summ[i][j]/cnt[i]
-        """
+            centro[i] = compute_centroids(groups[i], d)
+        print 'centro', centro, 'change', change
     return centro
 
 elem = [[1,0],[2,0],[3,0], [0,10], [0, 11]]
