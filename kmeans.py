@@ -1,54 +1,83 @@
+# K means
+import math
 
-
-def difference(pt1, pt2):
+def distance(pt1, pt2):
     d = len(pt1)
     summ = 0
     for i in range(d):
         summ += (pt1[i] - pt2[i])**2
     return summ
+#print distance([1,1,1], [2,3,4])
 
-#print difference([1,1,1], [2,3,4])
-# return an index
-def nearest_centeroid(element, centre, k):
+def near_which_centeroid(element, centre, k):
     min_diff = 0
     indx = 0
     for i in range(k):
-        diff = difference(element, centre[i])
+        diff = distance(element, centre[i])
         if (min_diff == 0):
             min_diff = diff # set baseline for max_diff
         if diff < min_diff:
             min_diff = diff
             indx = i
     return indx
-
-#print nearest_centeroid([0,0,0], [[-5,-5,-5],[10,10,10]], 2)
-
-def add_one_element(summ, point, d):
-    #for i in range(d):
-    #    summ[i] += point[i]
-    return summ
-
-#summ = [0.,0.,0.]
-#point=[1.,0.,0.]
-#print add_one_element(summ, point, 2)
+#print near_which_centeroid([0,0,0], [[-5,-5,-5],[10,10,10]], 2)
 
 def compute_centroids(points, d):
     summ=[0.]*d
-    cnt = 0
 
     n1 = len(points)
     if n1==0:
         return summ
 
     for i in range(n1):
-        cnt +=1
         for j in range(d):
             summ[j] += points[i][j]
     for j in range(d):
-        summ[j] = summ[j] / cnt
+        summ[j] = summ[j] / n1
     return summ
 
-# return the centeroids, and what the point belongs to
+def compute_variance(points, centro):
+    n1 = len(points)
+    summ = 0.0
+    for i in range(n1):
+        summ += distance(points[i], centro)
+
+    return summ/(n1)  # can't use (n1-1) since we may have only one point
+
+
+def num_occurance(number1, numbers):
+    cnt = 0
+    for i in range(len(numbers)):
+        if number1 == numbers[i]:
+           cnt +=1
+    return cnt
+
+def compute_entropy(numbers):
+    n = len(numbers)
+    if (n<=0):
+        return -1.0 # it's an error situation
+    p = 1/float(n)
+    set1 = set(numbers)
+    number1 = list(set1)
+    n1 = len(set1)
+    total = 0.0
+    for i in range(n1):
+        p = num_occurance(number1[i], numbers)/ float(n)
+        print 'xxxxxx, p', p
+        total -= (p * math.log(p))
+
+    return total
+
+x = [3, 3, 3]
+entr = compute_entropy(x)
+print  'xxxx, entropy', entr
+x = [1, 3, 3]
+entr = compute_entropy(x)
+print  'xxxx, entropy', entr
+x = [1, 2, 3]
+entr = compute_entropy(x)
+print  'xxxx, entropy', entr
+
 # points has n elements, each element is d-dimension
 def kmeans(points, k):
     # pick some centeroids
@@ -56,10 +85,17 @@ def kmeans(points, k):
     d = len(points[0])
     elem = [0.]*d
     centro = []
+    variance1 = []
+    if (k<=0):
+        k=1
+    if (k > n):  # at most, we can divide into n groups
+        k=n
+
     groups = [None]*k
     # use the initial k points as the centeroids
     for i in range(k):
         centro.append(points[i])
+        variance1.append(0.)
         groups[i] = []
     # assume each element is associated with centroid 0
     indx_arr = [0]*n
@@ -72,7 +108,7 @@ def kmeans(points, k):
         change = False
         iter_times += 1
         for i in range(n):
-            indx = nearest_centeroid(points[i], centro, k)
+            indx = near_which_centeroid(points[i], centro, k)
             if points[i] not in groups[indx]:
                 change = True
                 groups[indx].append(points[i])
@@ -81,11 +117,25 @@ def kmeans(points, k):
                 indx_arr[i] = indx
 
         print 'iter_times', iter_times, 'indx_arr', indx_arr
-        print 'groups[0]', groups[0], 'groups[1]', groups[1]
+        print 'groups[0]', groups[0]
         for i in range(k):
             centro[i] = compute_centroids(groups[i], d)
-        print 'centro', centro, 'change', change
-    return centro
+            variance1[i] = compute_variance(groups[i], centro[i])
 
-elem = [[1,0],[2,0],[3,0], [0,10], [0, 11]]
-print kmeans(elem, 2)
+        average1 = sum(variance1)/len(variance1)
+        print 'centro', centro, 'variance1', variance1, 'average1', average1, 'change', change
+    return centro, average1
+
+A = [[1,0],[2,0],[3,0], [0,10], [0, 11]]
+B = [[1,0],[2,0],[3,0], [0,10], [0, 11],[100,100]]
+elem = B
+
+for i in range(1, len(elem)+1):
+    centro, average1 = kmeans(elem, i)
+    print 'xxxxxxxx', i, average1
+# python kmeans.py | grep xxx
+# when k increases, average1 decreases very little, that's the right value of k
+
+
+#new_elem = [0,12]
+#print near_which_centeroid(new_elem, model, len(model))
