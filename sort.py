@@ -24,6 +24,9 @@ def exchange_pos(arr0, i, p_indx):
     arr0[p_indx + 1] = temp
     return arr0
 
+def partition(arr0, l, r):
+    return l
+
 def quicksort(arr0, l, r):
     print 'arr0, l, r', arr0, l, r
     n = r-l
@@ -31,17 +34,32 @@ def quicksort(arr0, l, r):
         return []
     if n==1:
         return [arr0[l]]
-    p = arr0[l]
+
+    #p_indx = partition(arr0, l, r)
     p_indx = l
-    for i in range(l+1, r):
-        if arr0[i] < p:
-            arr0 = exchange_pos(arr0, i, p_indx)
-            p_indx += 1
+    p = arr0[p_indx]
+    posit = 0 # 0 indicates it's on the left and 1 indicates on the right
+    ll = l+1
+    rr = r-1
+    while (rr - ll) >= 0:
+        if posit == 0:
+            if arr0[rr] < p:
+                arr0[p_indx] = arr0[rr]
+                p_indx = rr
+                posit = 1
+            rr -= 1
+        else:
+            if arr0[ll] > p:
+                arr0[p_indx] = arr0[ll]
+                p_indx = ll
+                posit = 0
+            ll += 1
+
     #print 'arr0, p_indx', arr0, p_indx
     return quicksort(arr0, l, p_indx) + [p] + quicksort(arr0, p_indx+1, r)
 
 
-q = quicksort(arrx, 0, len(arrx))
+q = quicksort(arr7, 0, len(arr7))
 print q
 
 def merge(arr1, arr2):
