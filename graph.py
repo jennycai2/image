@@ -1,6 +1,8 @@
 # graph
 
 # min cut ###########################################################
+import random
+import math
 file1 = '/Users/jenny/Downloads/KargerMinCut.txt'
 
 def get_array(filename):
@@ -48,7 +50,9 @@ def remove_one_edge(one_edge, edges):
 def get_one_edge(edges):
     one_edge = []
     if len(edges) > 1:
-        one_edge = edges[0]
+        indx = random.randrange(len(edges))
+        #print 'total ', len(edges), 'random', indx
+        one_edge = edges[indx]
         edges = remove_one_edge(one_edge, edges)
     #print 'xxx', one_edge, edges
     return one_edge, edges
@@ -171,36 +175,50 @@ v6 = merge_two_nodes(v5, 3, 5)
 v7 = merge_two_nodes(v6, 3, 6)
 #print v7
 
+def contract_graph(vertices_arr, edges):
+    cnt = 0
+    prev_edge_num = len(edges)
+    one_edge, edges = get_one_edge(edges)
+    #print one_edge
+    #print edges
+    while (one_edge!=[] and cnt < 2517):
+        cnt += 1
+        #print "iteration ", cnt
+        edges = convert_then_check_edges(one_edge, edges)
+        #print "after converting", edges, "edges have decreased ", prev_edge_num - len(edges), " to ", len(edges)
+        node0 = one_edge[0]
+        node1 = one_edge[1]
+        vertices_arr = merge_two_nodes(vertices_arr, node0, node1)
+
+        # sanity check
+        cnt1 = count_edges(vertices_arr) / 2 # ignore the cost elements
+        cnt2 = len(edges)
+        if cnt1 != cnt2:
+            print "Not equal!"
+        #print "cnt from vertices", cnt1, "cnt from edges", cnt2
+
+        prev_edge_num = len(edges)
+        one_edge, edges = get_one_edge(edges)
+        #print '\n\n', one_edge
+        #print edges
+
+    return vertices_arr
+
 arry = get_array(file1)
 print 'number of edges', count_edges(arry)  #2517
 edges = get_edges(arry)
 #print 'edges', edges
 vertices_arr = add_cost(arry)
 print 'number of nodes', len(vertices_arr)
-cnt = 0
-prev_edge_num = len(edges)
-one_edge, edges = get_one_edge(edges)
-#print one_edge
-#print edges
-while (one_edge!=[] and cnt < 2517):
-    cnt += 1
-    print "iteration ", cnt
-    edges = convert_then_check_edges(one_edge, edges)
-    #print "after converting", edges, "edges have decreased ", prev_edge_num - len(edges), " to ", len(edges)
-    node0 = one_edge[0]
-    node1 = one_edge[1]
-    vertices_arr = merge_two_nodes(vertices_arr, node0, node1)
-
-    # sanity check
-    cnt1 = count_edges(vertices_arr) / 2 # ignore the cost elements
-    cnt2 = len(edges)
-    if cnt1 != cnt2:
-        print "Not equal!"
-    #print "cnt from vertices", cnt1, "cnt from edges", cnt2
-
-    prev_edge_num = len(edges)
-    one_edge, edges = get_one_edge(edges)
-    #print '\n\n', one_edge
-    #print edges
-
-#print v1
+num_of_nodes = len(vertices_arr)
+total = int(num_of_nodes * num_of_nodes * math.log(num_of_nodes))
+print 'total iteration', total
+min_num = 0  #20
+for i in range(total):
+    two_vert = contract_graph(vertices_arr, edges)
+    num_of_edges = two_vert[0][2]
+    if (min_num == 0):
+        min_num = num_of_edges
+    if num_of_edges < min_num:
+        min_num = num_of_edges
+    print i, num_of_edges, min_num
