@@ -97,25 +97,24 @@ def BreadthFirstSearch(list1, s, t):
     # linear time
     # find everything you want
     # compute shortest path
-    result = []
+    result1 = {}
     for i in range(len(list1)): # init for each node
-        result.append([False, -1]) # not visited, distance is -1
+        result1[i] = [False, -1] # not visited, distance is -1
 
     queue = deque([s])  # init the queue with the root node
-    result[s][0] = True  # so we won't enqueue it again
-    result[s][1] = 0     # distance to itself is 0
+    result1[s] = [True, 0] # so we won't enqueue it again, distance to itself is 0
     while (len(queue) != 0):
         node0 = queue.popleft()
         #print "\nNow processing node ", node0
         sublist = list1[node0] # assume list starts from indx 0
         for i in range(1, len(sublist)):
             node1 = sublist[i]
-            if result[node1][0] == False: # if the node has not been enqueued, enqueue it
+            if result1[node1][0] == False: # if the node has not been enqueued, enqueue it
                 queue.append(node1)
-                result[node1][0] = True
-                result[node1][1] = result[node0][1] + 1
-    if result[t][0] == True and result[t][1] != -1:
-        return result[t][1] - result[s][1]
+                result1[node1][0] = True
+                result1[node1][1] = result1[node0][1] + 1
+    if result1[t][0] == True and result1[t][1] != -1:
+        return result1[t][1] - result1[s][1]
     return -1
 
 print BreadthFirstSearch(undirected_list, 1, 5)
