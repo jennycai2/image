@@ -16,21 +16,15 @@ word_list = ['cat', 'rats', 'dog', 'god', 'car', 'arts', 'star']
 def anagrams(list1):
     big_dict = {}
     for wd in list1:
-        # each word has different letter and associated count, I'll first do that and save in a dictionary
-        dict1 = {}
+        # separate a word into letters and sort the letters
+        list11 = []
         for i in range(len(wd)):
-            if wd[i] in dict1:
-               dict1[wd[i]] += 1
-            else:
-               dict1[wd[i]] = 1
-        print dict1
-        big_dict[wd] = sorted(list(dict1))
-    print big_dict
-    
-    list2 = list(big_dict)
+            list11.append(wd[i])
+        big_dict[wd] = tuple(sorted(list11))
+
    # need to reverse the entries in big_dict
-   # then sort it
     reverse_dict = {}
+    result = []
     for key1 in big_dict:
        value = big_dict[key1]
        if value in reverse_dict:
@@ -38,11 +32,12 @@ def anagrams(list1):
           reverse_dict[value] += (' ' + key1)
        else:
           reverse_dict[value] = key1
+
     for key2 in reverse_dict:
        words = reverse_dict[key2].split(' ')
-       if len (words)   != 1: # find anagrams
-          print words
-    return 0
+       if len (words) != 1: # find anagrams
+          result += words
+    return result
 
 
-anagrams(word_list)
+print anagrams(word_list)
