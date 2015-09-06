@@ -1,0 +1,15 @@
+
+# R
+# read .csv file into R studio
+loan = read.csv("/Users/jenny/Downloads/prosperLoanData.csv", header = TRUE)
+
+install.packages("ggplot2", dependencies = T)
+install.packages("knitr", dependencies = T)
+install.packages("dplyr", dependencies = T)
+
+# Python
+
+
+# Spark
+
+# Scala
